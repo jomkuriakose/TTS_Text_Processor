@@ -1,0 +1,1 @@
+source /music/jom/S2S_Project/TTS_Text_Processor/venv_text_processor/bin/activate
