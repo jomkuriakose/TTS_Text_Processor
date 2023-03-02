@@ -84,7 +84,7 @@ class TextCleaner:
 class Phonifier:
     def __init__(self, dict_location=None):
         if dict_location is None:
-            dict_location = "/speech/released_models/phone_dict"
+            dict_location = "/music/jom/S2S_Project/TTS_Text_Processor/phone_dict"
         self.dict_location = dict_location
 
         self.phone_dictionary = {}
