@@ -5,7 +5,6 @@ Developed by Arun Kumar A(CS20S013) - November 2022
 import os
 import re
 import json
-import pandas as pd
 import string
 from collections import defaultdict
 import time
@@ -15,6 +14,7 @@ from multiprocessing import Process
 import traceback
 from num_to_words import num_to_word
 from g2p_en import G2p
+import pandas as pd
 
 def add_to_dictionary(dict_to_add, dict_file):
     append_string = ""
@@ -349,7 +349,7 @@ class Phonifier:
 
             if(language == 'tamil'):
                 tamil_parser_cmd = "tamil_parser.sh"
-                subprocess.run(["bash", tamil_parser_cmd, non_dict_words_file, out_dict_file, timestamp, "/var/www/html/IITM_TTS/E2E_TTS_FS2/text_proc/text2phone/Tamil_Parser/ssn_parser"])
+                subprocess.run(["bash", tamil_parser_cmd, non_dict_words_file, out_dict_file, timestamp, "/music/jom/S2S_Project/TTS_Text_Processor/text2phone/Tamil_Parser/ssn_parser"])
             elif(language == 'english'):
                 phn_out_dict = {}
                 for i in range(0,len(non_dict_words)):
@@ -361,7 +361,7 @@ class Phonifier:
                     f.write(data_str)
             else:
                 unified_parser_cmd = "phonify_wrapper.sh"
-                subprocess.run(["bash", unified_parser_cmd, non_dict_words_file, out_dict_file, timestamp, "/var/www/html/IITM_TTS/E2E_TTS_FS2/text_proc/text2phone/"])
+                subprocess.run(["bash", unified_parser_cmd, non_dict_words_file, out_dict_file, timestamp, "/music/jom/S2S_Project/TTS_Text_Processor/text2phone/"])
             # unified_parser_cmd = "phonify_wrapper.sh"
             # subprocess.run(["bash", unified_parser_cmd, non_dict_words_file, out_dict_file, timestamp, "/var/www/html/IITM_TTS/E2E_TTS_FS2/text_proc/text2phone/"])
             # if len(eng_words) > 0:
@@ -435,7 +435,7 @@ class Phonifier:
 
             if(language == 'tamil'):
                 tamil_parser_cmd = "tamil_parser.sh"
-                subprocess.run(["bash", tamil_parser_cmd, non_dict_words_file, out_dict_file, timestamp, "/var/www/html/IITM_TTS/E2E_TTS_FS2/text_proc/text2phone/Tamil_Parser/ssn_parser"])
+                subprocess.run(["bash", tamil_parser_cmd, non_dict_words_file, out_dict_file, timestamp, "/music/jom/S2S_Project/TTS_Text_Processor/text2phone/Tamil_Parser/ssn_parser"])
             elif(language == 'english'):
                 phn_out_dict = {}
                 for i in range(0,len(non_dict_words)):
@@ -447,7 +447,7 @@ class Phonifier:
                     f.write(data_str)
             else:
                 unified_parser_cmd = "phonify_wrapper.sh"
-                subprocess.run(["bash", unified_parser_cmd, non_dict_words_file, out_dict_file, timestamp, "/var/www/html/IITM_TTS/E2E_TTS_FS2/text_proc/text2phone/"])
+                subprocess.run(["bash", unified_parser_cmd, non_dict_words_file, out_dict_file, timestamp, "/music/jom/S2S_Project/TTS_Text_Processor/text2phone/"])
             # unified_parser_cmd = "phonify_wrapper.sh"
             # subprocess.run(["bash", unified_parser_cmd, non_dict_words_file, out_dict_file, timestamp, "/var/www/html/IITM_TTS/E2E_TTS_FS2/text_proc/text2phone/"])
             try:
@@ -496,7 +496,7 @@ class TextNormalizer:
     def __init__(self, char_map_location=None, phonifier = Phonifier()):
         self.phonifier = phonifier
         if char_map_location is None:
-            char_map_location = "/var/www/html/IITM_TTS/E2E_TTS_FS2/text_proc/text_norm/charmap"
+            char_map_location = "/music/jom/S2S_Project/TTS_Text_Processor/text_norm/charmap"
         self.char_maps = {}
         # load char map for all the available languages
         for char_map_file in os.listdir(char_map_location):
