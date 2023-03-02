@@ -1,7 +1,8 @@
 # TTS Text processing package
 
 ## TODO
-1. 
+1. Sudhanshu - Integrating python unified parser (https://pypi.org/project/indic-unified-parser/) in parallel in old_text_preprocessor.py
+2. John - Write a function to convert numbers to cls using ipa to cls map. Write it as a class and have the map in the init function.
 
 ## Steps
 1. 
