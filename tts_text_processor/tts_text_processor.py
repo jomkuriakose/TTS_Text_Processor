@@ -41,7 +41,7 @@ class Phone_Dictionary:
                 dict_list = os.listdir(dict_location)
             except Exception as e:
                 print(traceback.format_exc())
-                printf("Error:: dictionary loading failed!!")
+                print("Error:: dictionary loading failed!!")
                 return
             dict_list = list(set(dict_list) & set(language_list))
         self.dict_list = dict_list
