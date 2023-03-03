@@ -4,18 +4,19 @@ Developed at IIT Madras by Jom Kuriakose, ...
 '''
 import os
 import traceback
-
-import re
-import json
-import string
-from collections import defaultdict
-import time
-import subprocess
-import shutil
-from multiprocessing import Process
-from num_to_words import num_to_word
-from g2p_en import G2p
 import pandas as pd
+from multiprocessing import Process
+
+import time
+
+# import re
+# import json
+# import string
+# from collections import defaultdict
+# import subprocess
+# import shutil
+# from num_to_words import num_to_word
+# from g2p_en import G2p
 
 # set global variables here
 ## location of phone dictionaries
@@ -26,12 +27,22 @@ language_list = ['assamese', 'bengali', 'bodo', 'english', 'gujarati', 'hindi', 
 language_list.sort()
 
 '''
-class to do phone dictionary operations
+class to do phone dictionary operations.
+dictionary contains word and its phone representation separated by a tab (\t)
+dictionary stored in self.phone_dictionary
+
+optional inputs to this module are:
+1) dict_location: dictionary_location
+2) lang_list: language_list
+if not set implicitly the global values will be taken as default
+
+functions in this module are:
 1) load dictionary
 2) read from dictionary
 3) check for word in dictionary
-4) update dictionary entry
-5) delete dictionary entry
+4) add new words to dictionary
+5) update dictionary file
+6) delete dictionary entry %% not implemented %% not sure if needed
 '''
 class Phone_Dictionary:
     '''
@@ -93,6 +104,7 @@ class Phone_Dictionary:
     
     def read_dict_entry(self, language, word):
         '''
+        read from dictionary
         '''
         try:
             return self.phone_dictionary[language][word]
@@ -100,6 +112,94 @@ class Phone_Dictionary:
             print(traceback.format_exc())
             print(f"word ({word}) not found in language ({language})!!")
             return False
+        
+    def check_dict_entry(self, language, word):
+        '''
+        check if the word is present in the dictionary
+        '''
+        try:
+            if word in self.phone_dictionary[language]:
+                return True
+            else:
+                return False
+        except Exception as e:
+            print(traceback.format_exc())
+            return False
+    
+    def add_to_dict(self, new_dict, language):
+        '''
+        add the new words to dictionary
+        '''
+        try:
+            if language not in self.phone_dictionary:
+                self.phone_dictionary[language] = new_dict
+            else:
+                self.phone_dictionary[language].update(new_dict)
+            # run a non-blocking child process to update the dictionary file
+            p = Process(target=self.__update_dict, args=(new_dict, language))
+            p.start()
+        except Exception as e:
+            print(traceback.format_exc())
 
+    def __update_dict(self, dict_to_add, language):
+        append_string = ""
+        for key, value in dict_to_add.items():
+            append_string += (str(key) + "\t" + str(value) + "\n")
+        
+        dict_file = os.path.join(self.dict_location, language)
+        
+        if os.path.isfile(dict_file):
+            # make a copy of the dictionary
+            source_dir = os.path.dirname(dict_file)
+            dict_file_name = os.path.basename(dict_file)
+            temp_file_name = "." + dict_file_name + ".temp"
+            temp_dict_file = os.path.join(source_dir, temp_file_name)
+            shutil.copy(dict_file, temp_dict_file)
+            # append the new words in the dictionary to the temp file
+            with open(temp_dict_file, "a") as f:
+                f.write(append_string)
+            # check if the write is successful and then replace the temp file as the dict file
+            try:
+                df_orig = pd.read_csv(dict_file, delimiter="\t", header=None, dtype=str)
+                df_temp = pd.read_csv(temp_dict_file, delimiter="\t", header=None, dtype=str)
+                if len(df_temp) > len(df_orig):
+                    os.rename(temp_dict_file, dict_file)
+                    print(f"{len(dict_to_add)} new words appended to dictionary: {dict_file}")
+            except:
+                print(traceback.format_exc())
+        else:
+            # create a new dictionary
+            with open(dict_file, "a") as f:
+                f.write(append_string)
+            print(f"new dictionary: {dict_file} created with {len(dict_to_add)} words")
+
+start_time = time.time()
 phone_dict = Phone_Dictionary()
-print(phone_dict.read_dict_entry("hindi","अकठोरीकृत"))
+end_time = time.time()
+print(f"time taken for loading the module: {end_time-start_time:.5f} seconds\n")
+start_time = time.time()
+print(phone_dict.read_dict_entry("hindi", "अकठोरीकृत"))
+end_time = time.time()
+print(f"time taken for reading: {end_time-start_time:.5f} seconds\n")
+start_time = time.time()
+print(phone_dict.read_dict_entry("hindi", "अकठोरीकृतअकठोरीकृत"))
+end_time = time.time()
+print(f"time taken for reading: {end_time-start_time:.5f} seconds\n")
+start_time = time.time()
+print(phone_dict.check_dict_entry("hindi", "अकठोरीकृत"))
+end_time = time.time()
+print(f"time taken for checking: {end_time-start_time:.5f} seconds\n")
+start_time = time.time()
+print(phone_dict.check_dict_entry("indian", "अकठोरीकृत"))
+end_time = time.time()
+print(f"time taken for checking: {end_time-start_time:.5f} seconds\n")
+start_time = time.time()
+print(phone_dict.check_dict_entry("hindi", "अकठोरीकृतअकठोरीकृत"))
+end_time = time.time()
+print(f"time taken for checking: {end_time-start_time:.5f} seconds")
+# new_dict = {}
+# new_dict["Jom"] = "Test"
+# start_time = time.time()
+# print(phone_dict.add_to_dict(new_dict, "hindi"))
+# end_time = time.time()
+# print(f"time taken for checking: {end_time-start_time:.5f} seconds")
