@@ -17,42 +17,89 @@ from num_to_words import num_to_word
 from g2p_en import G2p
 import pandas as pd
 
-# Set global variables here
+# set global variables here
 ## location of phone dictionaries
 dictionary_location = "/music/jom/S2S_Project/TTS_Text_Processor/phone_dict"
-## set the dictionary list to indian and english for using a single dictionary for all Indian languages in unified parser. If set as None, the dictionary list will automatically be read from the dictionary_location
-dictionary_list = ["indian", "english"]
-## list of languages supported by unified parser. Dictionary list will be subset of this.
+
+## list of languages supported by unified parser.
 language_list = ['assamese', 'bengali', 'bodo', 'english', 'gujarati', 'hindi', 'kannada', 'malayalam', 'manipuri', 'marathi', 'odia', 'rajasthani', 'tamil', 'telugu']
+language_list.sort()
 
+'''
+class to do phone dictionary operations
+1) load dictionary
+2) read from dictionary
+3) check for word in dictionary
+4) update dictionary entry
+5) delete dictionary entry
+'''
 class Phone_Dictionary:
-    def __init__(self, dict_location=None, dict_list=None, lang_list=None):
-        print(f"\nclass Phone_Dictionary :: loading __init__ :: loading phone dictionaries")
+    '''
+    select and load dictionaries
+    '''
+    def __init__(self, dict_location=None, lang_list=None):
+        print(f"\nclass Phone_Dictionary :: loading __init__ :: loading phone dictionaries\n")
 
-        # Unless specified set the default dictionary location
+        # unless specified set the default dictionary location
         if dict_location is None:
             dict_location = dictionary_location
         self.dict_location = dict_location
         print(f"dict_location:- {self.dict_location}")
 
-        # Check if the dictionary_list is specified and if not read the list of files and load
-        if dict_list is None:
-            try:
-                dict_list = os.listdir(dict_location)
-            except Exception as e:
-                print(traceback.format_exc())
-                print("Error:: dictionary loading failed!!")
-                return
-            dict_list = list(set(dict_list) & set(language_list))
-        self.dict_list = dict_list
+        # unless specified set the default language list
+        if lang_list is None:
+            lang_list = language_list
+        lang_list.sort()
+        self.lang_list = lang_list
+        print(f"lang_list:- {self.lang_list}")
+
+        # read the list of dictionary files and load
+        try:
+            # select all files in dict_location except hidden files
+            dict_list = [file for file in os.listdir(dict_location) if not file.startswith(".")]
+        except Exception as e:
+            print(traceback.format_exc())
+            print("Error:: dictionary loading failed!!")
+            return
+        self.dict_list = list(set(dict_list) & set(self.lang_list))
+        self.dict_list.sort()
         print(f"dict_list:- {self.dict_list}")
 
         # load dictionary from files
-        self.phone_dictionary = self.__load_dictionary(self.dict_location, self.dict_list)
+        print(f"\nloading phone dictionaries")
+        self.phone_dictionary = {}
+        try:
+            self.phone_dictionary = self.__load_dictionary()
+        except Exception as e:
+            print(traceback.format_exc())
+            print("Error:: dictionary loading failed!!")
+            return
+        print(f"phone dictionaries loaded for languages: {[self.phone_dictionary.keys()]}\n")
     
-    def __load_dictionary():
+    def __load_dictionary(self):
+        '''
+        loading the dictionaries from files
+        '''
+        for language in self.dict_list:
+            try:
+                dict_file_path = os.path.join(self.dict_location, language)
+                df = pd.read_csv(dict_file_path, delimiter="\t", header=None, dtype=str)
+                self.phone_dictionary[language] = df.set_index(0).to_dict('dict')[1]
+            except Exception as e:
+                print(traceback.format_exc())
+                print(f"Error:: loading dictionary failed for {language}!!")
+                continue
+        return self.phone_dictionary
+    
+    def read_dict_entry(self, language, word):
+        '''
+        '''
+        try:
+            return self.phone_dictionary[language][word]
+        except Exception as e:
+            print(traceback.format_exc())
+            print(f"word ({word}) not found in language ({language})!!")
+            return False
 
-phone_dict=Phone_Dictionary(dict_list=dictionary_list)
-# phone_dict=Phone_Dictionary(dict_location='temp')
-# phone_dict=Phone_Dictionary()
-print("Hello")
+phone_dict = Phone_Dictionary()
+print(phone_dict.read_dict_entry("hindi","अकठोरीकृत"))
