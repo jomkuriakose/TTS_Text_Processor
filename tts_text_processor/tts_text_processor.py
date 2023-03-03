@@ -176,6 +176,9 @@ class Phone_Dictionary:
                 f.write(append_string)
             print(f"new dictionary: {dict_file} created with {len(dict_to_add)} words")
 
+
+## commands to test the code.
+
 start_time = time.time()
 phone_dict = Phone_Dictionary()
 end_time = time.time()
