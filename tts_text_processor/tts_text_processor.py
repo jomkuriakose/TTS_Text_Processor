@@ -142,6 +142,9 @@ class Phone_Dictionary:
             print(traceback.format_exc())
 
     def __update_dict(self, dict_to_add, language):
+        '''
+        update the dictionary file with new words
+        '''
         append_string = ""
         for key, value in dict_to_add.items():
             append_string += (str(key) + "\t" + str(value) + "\n")
