@@ -1,0 +1,13 @@
+phone_dict/assamese
+phone_dict/bengali
+phone_dict/bodo
+phone_dict/gujarati
+phone_dict/hindi
+phone_dict/kannada
+phone_dict/malayalam
+phone_dict/manipuri
+phone_dict/marathi
+phone_dict/odia
+phone_dict/rajasthani
+phone_dict/tamil
+phone_dict/telugu
