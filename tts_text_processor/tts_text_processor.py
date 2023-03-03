@@ -3,7 +3,10 @@ TTS Text Processing Module
 Developed at SMV Lab, IIT Madras by Jom Kuriakose, etc...
 '''
 
+## Add only the necessary PACKAGES here.
+
 import os
+import shutil
 import traceback
 import pandas as pd
 from multiprocessing import Process
@@ -15,11 +18,11 @@ import time
 # import string
 # from collections import defaultdict
 # import subprocess
-# import shutil
 # from num_to_words import num_to_word
 # from g2p_en import G2p
 
-# set global variables here
+# set GLOBAL VARIABLES here
+
 ## location of phone dictionaries
 dictionary_location = "/music/jom/S2S_Project/TTS_Text_Processor/phone_dict"
 
@@ -27,29 +30,29 @@ dictionary_location = "/music/jom/S2S_Project/TTS_Text_Processor/phone_dict"
 language_list = ['assamese', 'bengali', 'bodo', 'english', 'gujarati', 'hindi', 'kannada', 'malayalam', 'manipuri', 'marathi', 'odia', 'rajasthani', 'tamil', 'telugu']
 language_list.sort()
 
-'''
-class to do phone dictionary operations.
-dictionary contains word and its phone representation separated by a tab (\t)
-dictionary stored in self.phone_dictionary
-
-optional inputs to this module are:
-1) dict_location: dictionary_location
-2) lang_list: language_list
-if not set implicitly the global values will be taken as default
-
-functions in this module are:
-1) load dictionary
-2) read from dictionary
-3) check for word in dictionary
-4) add new words to dictionary
-5) update dictionary file
-6) delete dictionary entry %% not implemented %% not sure if needed
-'''
 class Phone_Dictionary:
     '''
-    select and load dictionaries
-    '''
+    class to do phone dictionary operations.
+    dictionary contains word and its phone representation separated by a tab (\t)
+    dictionary stored in self.phone_dictionary
+
+    optional inputs to this module are:
+    1) dict_location: dictionary_location
+    2) lang_list: language_list
+    if not set implicitly the global values will be taken as default
+
+    functions in this module are:
+    1) load dictionary
+    2) read from dictionary
+    3) check for word in dictionary
+    4) add new words to dictionary
+    5) update dictionary file
+    6) delete dictionary entry %% not implemented %% not sure if needed
+    ''' 
     def __init__(self, dict_location=None, lang_list=None):
+        '''
+        select and load dictionaries
+        '''
         print(f"\nclass Phone_Dictionary :: loading __init__ :: loading phone dictionaries\n")
 
         # unless specified set the default dictionary location
@@ -177,6 +180,41 @@ class Phone_Dictionary:
                 f.write(append_string)
             print(f"new dictionary: {dict_file} created with {len(dict_to_add)} words")
 
+## SUDHANSHU
+class Word_Parser:
+    '''
+    class for unified parser, ssn tamil parser and english parser
+
+    inputs to this module are:
+    1) tamil_parser_path: ssn_tamil_parser_location
+    if not set implicitly the global values will be taken as default
+    since unified parser and english parser are python packages, load that in the start of the tts_text_processor module
+
+    functions in this module are:
+    1) parse words function with inputs list of words and language
+    2) unified parser function - parallelized
+    3) english parser function - parallelized
+    4) tamil parser function - not parallelized
+    '''
+    def __init__(self, tamil_parser_path=None):
+        '''
+        check and load parsers or set parser paths
+        '''
+
+## JOHN
+class Numerical_Parser:
+    '''
+    class for parsing number to phone text
+
+    functions in this module are:
+    1) parse numbers function with inputs list of numbers and language
+    2) number parser - parallelized
+    add new modules for different types of numbers like int, float, fraction etc...
+    '''
+    def __init__(self):
+        '''
+        check and load defaults if any
+        '''
 
 ## commands to test the code.
 
