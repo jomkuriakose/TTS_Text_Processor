@@ -1,6 +1,6 @@
 '''
 TTS Text Processing Module
-Developed at IIT Madras by Jom Kuriakose, ...
+Developed at SMV Lab, IIT Madras by Jom Kuriakose, etc...
 '''
 import os
 import traceback
