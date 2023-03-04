@@ -47,7 +47,8 @@ class Phone_Dictionary:
     3) check for word in dictionary
     4) add new words to dictionary
     5) update dictionary file
-    6) delete dictionary entry %% not implemented %% not sure if needed
+    6) edit a entry in dictionary
+    7) delete dictionary entry
     ''' 
     def __init__(self, dict_location=None, lang_list=None):
         '''
@@ -130,7 +131,7 @@ class Phone_Dictionary:
             print(traceback.format_exc())
             return False
     
-    def add_to_dict(self, new_dict, language):
+    def add_to_dict(self, language, new_dict):
         '''
         add the new words to dictionary
         '''
@@ -144,7 +145,18 @@ class Phone_Dictionary:
             p.start()
         except Exception as e:
             print(traceback.format_exc())
+    
+    def edit_dict(self, language, new_dict):
+        '''
+        edit already existing dictionary entries
+        '''
 
+    def delete_dict_entry(self, language, del_dict):
+        '''
+        delete the entries in del_dict from the phone dictionary
+        '''
+
+    # change __update_dict to have add, delete and update dictionary operations
     def __update_dict(self, dict_to_add, language):
         '''
         update the dictionary file with new words
@@ -245,6 +257,6 @@ print(f"time taken for checking: {end_time-start_time:.5f} seconds")
 # new_dict = {}
 # new_dict["Jom"] = "Test"
 # start_time = time.time()
-# print(phone_dict.add_to_dict(new_dict, "hindi"))
+# print(phone_dict.add_to_dict("hindi", new_dict))
 # end_time = time.time()
 # print(f"time taken for checking: {end_time-start_time:.5f} seconds")
