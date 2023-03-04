@@ -1,6 +1,10 @@
 '''
 TTS Text Processing Module
-Developed at SMV Lab, IIT Madras by Jom Kuriakose, etc...
+Developed at SMV Lab, IIT Madras -- Prof. Hema A. Murthy
+
+Contributors
+1) Jom Kuriakose
+## Add your names here.
 '''
 
 ## Add only the necessary PACKAGES here.
