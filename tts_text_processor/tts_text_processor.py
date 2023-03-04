@@ -228,6 +228,22 @@ class Numerical_Parser:
         check and load defaults if any
         '''
 
+## all - Need major discussion here.
+class Input_Str_Processor:
+    '''
+    class for processing input string to find the type of words, like numbers, equations, date, abbreviations, math symbols, other symbols, brackets, 200c-200e, etc...
+
+    functions in this module are:
+    1) parse string to find types of strings
+    add new modules for detecting different types of string.
+
+    new classes for processing these has to be developed based on what all we can detect.
+    '''
+    def __init__(self):
+        '''
+        check and load defaults if any
+        '''
+
 ## commands to test the code.
 
 start_time = time.time()
