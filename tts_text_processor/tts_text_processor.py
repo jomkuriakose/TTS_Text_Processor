@@ -34,6 +34,9 @@ dictionary_location = "/music/jom/S2S_Project/TTS_Text_Processor/phone_dict"
 language_list = ['assamese', 'bengali', 'bodo', 'english', 'gujarati', 'hindi', 'kannada', 'malayalam', 'manipuri', 'marathi', 'odia', 'rajasthani', 'tamil', 'telugu']
 language_list.sort()
 
+## update dictionary file
+update_dict_flag = True
+
 class Phone_Dictionary:
     '''
     class to do phone dictionary operations.
@@ -144,57 +147,154 @@ class Phone_Dictionary:
                 self.phone_dictionary[language] = new_dict
             else:
                 self.phone_dictionary[language].update(new_dict)
-            # run a non-blocking child process to update the dictionary file
-            p = Process(target=self.__update_dict, args=(new_dict, language))
-            p.start()
+            if update_dict_flag:
+                # run a non-blocking child process to update the dictionary file
+                p = Process(target=self.__update_dict_file, args=(new_dict, language, 'add'))
+                p.start()
         except Exception as e:
             print(traceback.format_exc())
     
-    def edit_dict(self, language, new_dict):
+    def edit_dict(self, language, edit_dict):
         '''
         edit already existing dictionary entries
         '''
+        try:
+            if language not in self.phone_dictionary:
+                self.phone_dictionary[language] = edit_dict
+            else:
+                self.phone_dictionary[language].update(edit_dict)
+            if update_dict_flag:
+                # run a non-blocking child process to update the dictionary file
+                p = Process(target=self.__update_dict_file, args=(edit_dict, language, 'replace'))
+                p.start()
+        except Exception as e:
+            print(traceback.format_exc())
 
     def delete_dict_entry(self, language, del_dict):
         '''
         delete the entries in del_dict from the phone dictionary
         '''
-
-    # change __update_dict to have add, delete and update dictionary operations
-    def __update_dict(self, dict_to_add, language):
-        '''
-        update the dictionary file with new words
-        '''
-        append_string = ""
-        for key, value in dict_to_add.items():
-            append_string += (str(key) + "\t" + str(value) + "\n")
-        
-        dict_file = os.path.join(self.dict_location, language)
-        
-        if os.path.isfile(dict_file):
-            # make a copy of the dictionary
-            source_dir = os.path.dirname(dict_file)
-            dict_file_name = os.path.basename(dict_file)
-            temp_file_name = "." + dict_file_name + ".temp"
-            temp_dict_file = os.path.join(source_dir, temp_file_name)
-            shutil.copy(dict_file, temp_dict_file)
-            # append the new words in the dictionary to the temp file
-            with open(temp_dict_file, "a") as f:
-                f.write(append_string)
-            # check if the write is successful and then replace the temp file as the dict file
+        for key in del_dict.keys():
             try:
-                df_orig = pd.read_csv(dict_file, delimiter="\t", header=None, dtype=str)
-                df_temp = pd.read_csv(temp_dict_file, delimiter="\t", header=None, dtype=str)
-                if len(df_temp) > len(df_orig):
-                    os.rename(temp_dict_file, dict_file)
-                    print(f"{len(dict_to_add)} new words appended to dictionary: {dict_file}")
-            except:
+                del self.phone_dictionary[language][key]
+            except Exception as e:
                 print(traceback.format_exc())
+                continue
+        if update_dict_flag:
+            try:
+                # run a non-blocking child process to update the dictionary file
+                p = Process(target=self.__update_dict_file, args=(del_dict, language, 'delete'))
+                p.start()
+            except Exception as e:
+                print(traceback.format_exc())
+
+    def __update_dict_file(self, update_dict, language, operation):
+        '''
+        update the dictionary file. operations: add, delete, replace
+        '''
+        dict_file = os.path.join(self.dict_location, language)
+        if operation == "add":
+            '''
+            add the new words to the dictionary file without checking if the entry already exists
+            '''
+            append_string = ""
+            for key, value in update_dict.items():
+                append_string += (str(key) + "\t" + str(value) + "\n")
+            
+            # update the dict file
+            if os.path.isfile(dict_file):
+                # make a copy of the dictionary
+                source_dir = os.path.dirname(dict_file)
+                dict_file_name = os.path.basename(dict_file)
+                temp_file_name = "." + dict_file_name + ".temp"
+                temp_dict_file = os.path.join(source_dir, temp_file_name)
+                print(f"copy dict_file: {dict_file} to temp_dict_file: {temp_dict_file}")
+                shutil.copyfile(dict_file, temp_dict_file)
+                # append the new words in the dictionary to the temp file
+                with open(temp_dict_file, "a") as f:
+                    f.write(append_string)
+                # check if the write is successful and then replace the temp file as the dict file
+                try:
+                    df_orig = pd.read_csv(dict_file, delimiter="\t", header=None, dtype=str)
+                    df_temp = pd.read_csv(temp_dict_file, delimiter="\t", header=None, dtype=str)
+                    if len(df_temp) > len(df_orig):
+                        os.rename(temp_dict_file, dict_file)
+                        print(f"{len(update_dict)} new words appended to dictionary: {dict_file}")
+                except:
+                    print(traceback.format_exc())
+            else:
+                # create a new dictionary
+                with open(dict_file, "a") as f:
+                    f.write(append_string)
+                print(f"new dictionary: {dict_file} created with {len(update_dict)} words")
+        elif operation == "replace":
+            '''
+            update the already existing dictionary entries along with adding new ones to the dictionary
+            '''
+            update_string = ""
+            for key, value in self.phone_dictionary[language].items():
+                update_string += (str(key) + "\t" + str(value) + "\n")
+            
+            # update the dict file
+            if os.path.isfile(dict_file):
+                # make a copy of the dictionary
+                source_dir = os.path.dirname(dict_file)
+                dict_file_name = os.path.basename(dict_file)
+                temp_file_name = "." + dict_file_name + ".temp"
+                temp_dict_file = os.path.join(source_dir, temp_file_name)
+                print(f"copy dict_file: {dict_file} to temp_dict_file: {temp_dict_file}")
+                shutil.copyfile(dict_file, temp_dict_file)
+                # append the new words in the dictionary to the temp file
+                with open(temp_dict_file, "w") as f:
+                    f.write(update_string)
+                # check if the write is successful and then replace the temp file as the dict file
+                try:
+                    df_orig = pd.read_csv(dict_file, delimiter="\t", header=None, dtype=str)
+                    df_temp = pd.read_csv(temp_dict_file, delimiter="\t", header=None, dtype=str)
+                    if len(df_temp) >= len(df_orig):
+                        os.rename(temp_dict_file, dict_file)
+                        print(f"updated the dictionary: {dict_file}")
+                except:
+                    print(traceback.format_exc())
+            else:
+                # create a new dictionary
+                with open(dict_file, "a") as f:
+                    f.write(update_string)
+                print(f"new dictionary: {dict_file} created with {len(update_dict)} words")
+        elif operation == "delete":
+            '''
+            delete entries from the dictionary if present
+            '''
+            update_string = ""
+            for key, value in self.phone_dictionary[language].items():
+                update_string += (str(key) + "\t" + str(value) + "\n")
+            
+            # update the dict file
+            if os.path.isfile(dict_file):
+                # make a copy of the dictionary
+                source_dir = os.path.dirname(dict_file)
+                dict_file_name = os.path.basename(dict_file)
+                temp_file_name = "." + dict_file_name + ".temp"
+                temp_dict_file = os.path.join(source_dir, temp_file_name)
+                print(f"copy dict_file: {dict_file} to temp_dict_file: {temp_dict_file}")
+                shutil.copyfile(dict_file, temp_dict_file)
+                # append the new words in the dictionary to the temp file
+                with open(temp_dict_file, "w") as f:
+                    f.write(update_string)
+                # check if the write is successful and then replace the temp file as the dict file
+                try:
+                    df_orig = pd.read_csv(dict_file, delimiter="\t", header=None, dtype=str)
+                    df_temp = pd.read_csv(temp_dict_file, delimiter="\t", header=None, dtype=str)
+                    if len(df_temp) <= len(df_orig):
+                        os.rename(temp_dict_file, dict_file)
+                        print(f"updated the dictionary: {dict_file}")
+                except:
+                    print(traceback.format_exc())
+            else:
+                # dictionary doesn't exist
+                print(f"dictionary: {dict_file} doesn't exist\ndelete from dictionary failed\nadd to dictionary to create the dictionary")
         else:
-            # create a new dictionary
-            with open(dict_file, "a") as f:
-                f.write(append_string)
-            print(f"new dictionary: {dict_file} created with {len(dict_to_add)} words")
+            print(f"operation ({operation}) not supported\npossible operations are (add, replace, delete)\ndictionary file not updated")
 
 ## SUDHANSHU
 class Word_Parser:
