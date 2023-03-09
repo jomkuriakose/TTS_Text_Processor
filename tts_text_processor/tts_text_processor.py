@@ -14,6 +14,9 @@ import shutil
 import traceback
 import pandas as pd
 from multiprocessing import Process
+import subprocess as sp # #In-order to run shell commands in python
+import numpy as np      #we need to import subprocess and os
+import re               # To deal with regular expressions within text
 
 import time
 
@@ -318,7 +321,6 @@ class Word_Parser:
         '''
 
 ## JOHN WESLY
-class Numerical_Parser:
     '''
     class for parsing number to phone text
 
@@ -331,11 +333,11 @@ class Numerical_Parser:
         
         check and load defaults if any
         '''
-    #!/usr/bin/env python   #run this script in python environment
+#!/usr/bin/env python   #run this script in python environment
 # -*- coding: utf-8 -*- # utf-8 For better encoding of the text
-import subprocess as sp # #In-order to run shell commands in python
-import numpy as np      #we need to import subprocess and os
-import re               # To deal with regular expressions within text
+#import subprocess as sp # #In-order to run shell commands in python
+#import numpy as np      #we need to import subprocess and os
+#import re               # To deal with regular expressions within text
 class Numerical_Parser: # Create seperate Class as Numerical Parser for calling it anywhere
 
     def __init__(self): #Intialize parameters globally
@@ -384,7 +386,7 @@ class Numerical_Parser: # Create seperate Class as Numerical Parser for calling 
         #run through ipa text and map equavalent cls phonemes and remove miscellaneous special characters from text using re and substitute with empty space
         cls_Phonemes = re.sub("ː|\.", '', ''.join([self.ipa2Cls_map.get(c, c) for c in ipa_phone_list]).strip())
 
-        # print(f"\nipa_phone_map: {ipa_phonemes}\ncls_phone_map: {cls_Phonemes}")
+        print(f"\nipa_phone_map: {ipa_phonemes}\ncls_phone_map: {cls_Phonemes}")
         return cls_Phonemes
 
 num_parse = Numerical_Parser() #create class object and assign with num_parse variable
@@ -392,14 +394,14 @@ num_parse.Number_IPA_CLS(19, 'telugu') #call function num_ipa_cls with class obj
 
 #test code with various cases
 # test with decimal numbers
-for i in np.arange(0, 3, 0.1):
-  print(f"number: {i}, output: {num_parse.Number_IPA_CLS(i, 'hindi')}")
+#for i in np.arange(0, 3, 0.1):
+  #print(f"number: {i}, output: {num_parse.Number_IPA_CLS(i, 'hindi')}")
 # test with integers in multiples of ten
-for i in np.arange(80, 110, 10):
-  print(f"number: {i}, output: {num_parse.Number_IPA_CLS(i, 'tamil')}")
+#for i in np.arange(80, 110, 10):
+  #print(f"number: {i}, output: {num_parse.Number_IPA_CLS(i, 'tamil')}")
 # test with integers in multiples of hundred 
-for i in np.arange(900, 991, 1):
-  print(f"number: {i}, output: {num_parse.Number_IPA_CLS(i, 'malayalam')}")
+#for i in np.arange(900, 991, 1):
+  #print(f"number: {i}, output: {num_parse.Number_IPA_CLS(i, 'malayalam')}")
 # test with fractional numbers
 # test with logarithmic numbers
 # test with exponential numbers
@@ -454,3 +456,6 @@ print(f"time taken for checking: {end_time-start_time:.5f} seconds")
 # print(phone_dict.add_to_dict("hindi", new_dict))
 # end_time = time.time()
 # print(f"time taken for checking: {end_time-start_time:.5f} seconds")
+start_time = time.time()
+print(num_parse.Number_IPA_CLS(19, 'telugu'))
+end_time = time.time()
