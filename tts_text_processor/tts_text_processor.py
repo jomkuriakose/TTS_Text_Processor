@@ -4,7 +4,7 @@ Developed at SMV Lab, IIT Madras -- Prof. Hema A. Murthy
 
 Contributors
 1) Jom Kuriakose
-## Add your names here.
+2) John Wesly
 '''
 
 ## Add only the necessary PACKAGES here.
@@ -317,7 +317,7 @@ class Word_Parser:
         check and load parsers or set parser paths
         '''
 
-## JOHN
+## JOHN WESLY
 class Numerical_Parser:
     '''
     class for parsing number to phone text
@@ -326,11 +326,85 @@ class Numerical_Parser:
     1) parse numbers function with inputs list of numbers and language
     2) number parser - parallelized
     add new modules for different types of numbers like int, float, fraction etc...
-    '''
+    
     def __init__(self):
-        '''
+        
         check and load defaults if any
         '''
+    #!/usr/bin/env python   #run this script in python environment
+# -*- coding: utf-8 -*- # utf-8 For better encoding of the text
+import subprocess as sp # #In-order to run shell commands in python
+import numpy as np      #we need to import subprocess and os
+import re               # To deal with regular expressions within text
+class Numerical_Parser: # Create seperate Class as Numerical Parser for calling it anywhere
+
+    def __init__(self): #Intialize parameters globally
+                        #create espeak language identifier dictionary.
+                        # It is useful to map language key with language identifier
+                        # We need this mapped value to invoke espeak shell command using python
+                        #bodo and rajasthani are not found on espeak
+        self.Espeak_ID={'assamese':'as', 'bengali':'bn','english':'en',
+                          'gujarati':'gu', 'hindi':'hi', 'kannada':'kn',
+                            'malayalam':'ml', 'manipuri':'bpy', 'marathi':'mr',
+                              'odia':'or', 'tamil':'ta', 'telugu':'te','spanish':'es',
+                              'french':'fr', 'greek':'el','chinese':'yue','portuguese':'pt',
+                              'punjabi':'pa','urdu':'ur','arabic':'ar','amharic':'am',
+                              'burmese':'my','american english':'en-us','iranian':'fa',
+                              'hebrew':'he','italian':'it','japanese':'ja',
+                              'konkani':'kok','korean':'ko', 'kurdish':'ku','latin':'la',
+                              'nepali':'ne','russian':'ru','german':'de'}
+                        #create espeak(ipa) phonemes with common label set(CLS) phonemes--
+                        # Meticously this dataset has been created at SMV lab, IIT Madras for mapping Num_Text:espeak IPA to CLS
+        self.ipa2Cls_map={'a':'a', 'ã':'aa mq', 'æ':'axx', 'aɪ':'ai', 'aɪ̃':'ai q', 'aʊ':'au', 'ɐ':'a', 'b':'b','bʰ':'bh',
+    'c':'c', 'cʰ':'ch', 'cʰcʰ':'ch', 'ɕ':'sh', 'd':'d', 'dʰ':'dh', 'ɖ':'dx', 'ɖʰ':'dxh', 'e':'e',
+    'ẽ':'ee', 'ə':'a', 'ɛ':'e ', 'ɛ̃':'ei q', 'f':'f', 'ɡ':'g', 'ɡʰ':'gh', 'h':'h', 'i':'i', 'ĩ':'',
+    'ɪ':'i', 'ɪ̃':'i', 'ɨ':'eu', 'j':'y', 'ʲ':'y', 'ɟ':'z', 'k':'k', 'kʰ':'kh', 'l':'l', 'ɭ':'lx',
+    'm':'m', 'n':'n', 'nʲ':'n', 'ɲ':'nj', 'ɳ':'nx', 'ŋ':'n', 'ŋ̃':'ng', 'o':'o', 'õ':'oo', 'ɔ':'ou',
+    'ɔ̃':'ou q', 'p':'p', 'p̃':'p', 'r':'r', 'r.':'zh', 'ɹ':'r', 'ɻ':'zh', 'ɾ':'r', 's':'s', 'ʂ':'sx',
+    'ʃ':'sh', 't':'t', 'tʰ':'t t', 'tʃ':'c', 'tʃʰ':'c', 'ʈ':'tx', 'ʈʰ':'txh', 'ʈʰʈʰ':"txh t'xh",
+    'u':'u', 'ũ':'u', 'ʉ':'eu', 'ʉʲ':'eu', 'ʊ':'u', 'ʊ̃':'u', 'v':'w', 'ʋ':'w', 'ʌ':'a','ʌ̃':'a',
+    'w':'w', 'z':'z', 'θ':'r', 'χ':'s', '/':'bɑɪ̯'}
+
+    def Number_IPA_CLS(self, number,language):
+        if isinstance(number, int):
+          pass
+        else:
+          isinstance(number, float)
+          number = round(number,3)
+        # get espeak language identifier using espeak_id dictiionary key laguage
+        espeak_language_id = self.Espeak_ID[language]
+        #sudo apt-get install libespeak-ng1
+        #pip install espeak_phonemizer
+        # Espeak shell command assigned to phonemize number variable, --no-stress to remove stress artifacts 
+        phonemize_Number = f"echo '{number}' | espeak-phonemizer -v {espeak_language_id} --no-stress -p '|'"
+        # Run shell command using subprocess returns number in IPA
+        ipa_phonemes = re.sub("ː|\.", '', sp.check_output(phonemize_Number, shell=True, universal_newlines=True).strip())
+        ipa_phone_list = ipa_phonemes.replace(' ','| |').strip().split('|')
+        # print(ipa_phone_list)
+        #run through ipa text and map equavalent cls phonemes and remove miscellaneous special characters from text using re and substitute with empty space
+        cls_Phonemes = re.sub("ː|\.", '', ''.join([self.ipa2Cls_map.get(c, c) for c in ipa_phone_list]).strip())
+
+        # print(f"\nipa_phone_map: {ipa_phonemes}\ncls_phone_map: {cls_Phonemes}")
+        return cls_Phonemes
+
+num_parse = Numerical_Parser() #create class object and assign with num_parse variable
+num_parse.Number_IPA_CLS(19, 'telugu') #call function num_ipa_cls with class object num_parse
+
+#test code with various cases
+# test with decimal numbers
+for i in np.arange(0, 3, 0.1):
+  print(f"number: {i}, output: {num_parse.Number_IPA_CLS(i, 'hindi')}")
+# test with integers in multiples of ten
+for i in np.arange(80, 110, 10):
+  print(f"number: {i}, output: {num_parse.Number_IPA_CLS(i, 'tamil')}")
+# test with integers in multiples of hundred 
+for i in np.arange(900, 991, 1):
+  print(f"number: {i}, output: {num_parse.Number_IPA_CLS(i, 'malayalam')}")
+# test with fractional numbers
+# test with logarithmic numbers
+# test with exponential numbers
+# test with trignometric functions, etc.
+
 
 ## all - Need major discussion here.
 class Input_Str_Processor:
