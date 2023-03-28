@@ -333,11 +333,7 @@ class Word_Parser:
         
         check and load defaults if any
         '''
-#!/usr/bin/env python   #run this script in python environment
-# -*- coding: utf-8 -*- # utf-8 For better encoding of the text
-#import subprocess as sp # #In-order to run shell commands in python
-#import numpy as np      #we need to import subprocess and os
-#import re               # To deal with regular expressions within text
+
 class Numerical_Parser: # Create seperate Class as Numerical Parser for calling it anywhere
 
     def __init__(self): #Intialize parameters globally
